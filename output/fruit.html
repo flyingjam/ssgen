@@ -1,0 +1,77 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+
+<body>
+    <span class="center-block emblem" style="background-image: url('static/nhscrest.png');"></span>
+    <!-- <img class="center-block emblem" src="static/nhscrest.png"> -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle Navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand">Northview High School</a>
+            </div>
+            <div class="colapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a>thing</a></li>
+                </ul>
+                <form class="navbar-form navbar-right" role="search">
+                    <input type="text" class="for-control" placeholder="Search">
+                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search" style="margin-top: 3px; margin-bottom: 3px;" aria-hidden="true"></span></button>
+                </form>
+            </div>
+        </div>
+        <div class="container">
+            <div class="collapse navbar-collapse" id="navbarsomethingsomething">
+                <ul class="nav navbar-nav col-md-9">
+                    <li class=" col-md-1">fruit<li class=" col-md-1">apple</li></li>
+<li class=" col-md-1">sub1</li>
+<li class=" col-md-1">sub2<li class=" col-md-1">sub2sub1</li><li class=" col-md-1">sub2sub2</li></li> 
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <header id="header-carousel" class="carousel slide">
+        <ol class="carousel-indicators">
+            <li data-target="#header-carousel" data-slide-to="0" class="active"></li>
+            <li data-target="#header-carousel" data-slide-to="1"></li>
+            <li data-target="#header-carousel" data-slide-to="2"></li>
+        </ol>
+        <div class="carousel-inner">
+            <div class="item active">
+                <div class="fill" style="background-image: url('arch.jpg')"></div>
+            </div>
+            <div class="item">
+                <div class="fill" style="background-image: url('arch.jpg')"></div>
+            </div>
+            <div class="item">
+                <div class="fill" style="background-image: url('arch.jpg')"></div>
+            </div>
+        </div>
+        <a class="left carousel-control" href="#header-carousel" data-slide="pref">
+            <span class="icon-prev"></span>
+        </a>
+        <a class="right carousel-control" href="#header-carousel" data-slide="next">
+            <span class="icon-next"></span>
+        </a>
+    </header>
+    There are many kind of fruit, but I only give a shit about apples.
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script>
+    $('.carousel').carousel({
+        interval: 5000
+    })
+    </script>
+</body>
+
+</html>

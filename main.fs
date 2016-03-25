@@ -1,9 +1,18 @@
 open System.IO
 open NSoup
 open CommonMark
- 
-let CreateElement tag text=
-    (NSoup.Nodes.Element(NSoup.Parse.Tag.ValueOf(tag), "test")).Text(text)
+
+let read path =
+    try
+        Some(File.ReadAllText(path))
+    with
+    |_ -> None
+
+let CreateElement tag text c =
+    let tag = (NSoup.Nodes.Element(NSoup.Parse.Tag.ValueOf(tag), "test")).Text(text)
+    match c with
+    |"" -> tag
+    |_ -> (tag.AddClass(c))
 
 let getLastDirectory (dir : string) =
     let index = dir.Replace("\\", "/").LastIndexOf("/")
@@ -25,8 +34,54 @@ let getIndex dir =
     |_ -> Some(candidates.Head)
 
 
+let getNav directory =
+    let addtoHtml sub (html : NSoup.Nodes.Element) =
+        sub |> List.iter (fun x ->
+            printfn "%s" (getLastDirectory x);
+            html.AppendChild(CreateElement "li" (getLastDirectory x) "col-md-1") |> ignore)
+
+    let findSub tags sub =
+        tags |> List.find (fun (x : NSoup.Nodes.Element) -> x.OwnText() = sub)
+
+    let rec loop head (html : NSoup.Nodes.Element) =
+        let dir = Path.Combine("input", head)
+        let sub = Directory.GetDirectories(dir) |> Seq.toList
+        addtoHtml sub html
+        match sub with
+        |[] -> ()
+        |_ -> sub |> List.iter (fun x -> 
+                printfn "next - %s" (Path.Combine(head, getLastDirectory x));
+                loop (Path.Combine(head, getLastDirectory x)) (findSub (html.Children |> Seq.toList) (getLastDirectory x)))
+
+    let sub = Directory.GetDirectories("input") |> Seq.toList
+    let html = CreateElement "ul" "" "collapse navbar-collapse"
+    loop "" html
+    (html.Html())
+
+let renderTemplate head body =
+    let HEADER_REPLACE = "|HEADER|"
+    let BODY_REPLACE = "|BODY|"
+    
+    let template = match (read "templates/template.html") with
+    |None -> "|BODY|"
+    |Some(x) -> x
+    
+    let templateWithHeader = match(template.Contains(HEADER_REPLACE)) with
+    |true -> template.Replace(HEADER_REPLACE, head)
+    |false -> template
+    
+    let templateWithBody = match(templateWithHeader.Contains(BODY_REPLACE)) with
+    |true -> templateWithHeader.Replace(BODY_REPLACE, body)
+    |false -> templateWithHeader
+
+    templateWithBody
 
 let recurFile directory =
+    let processFile source destination =
+        let file = File.ReadAllText(source)
+        let processedFile = renderTemplate (getNav "") file
+        File.WriteAllText(destination, processedFile)
+
     let copyFiles head oldHead =
         let getOutputName dir =
             Directory.GetParent(dir).FullName |> getLastDirectory
@@ -39,7 +94,8 @@ let recurFile directory =
             let t = Path.Combine(source, x);
             match (Path.GetFileName(x) = "index.html") with
             |false -> ()
-            |true -> (File.Copy(t, Path.Combine(output, (getOutputName t) + ".html"), true)))
+            |true -> processFile t (Path.Combine(output, (getOutputName t)) + ".html"))
+            //|true -> (File.Copy(t, Path.Combine(output, (getOutputName t) + ".html"), true)))
 
 
         (*
@@ -59,43 +115,8 @@ let recurFile directory =
                 loop (Path.Combine(head, getLastDirectory x)) head)
     loop "" ""
     0
-
-
-        //html is the parent tag which children is being added to
-let getNav directory =
-    let addtoHtml sub (html : NSoup.Nodes.Element) =
-        sub |> List.iter (fun x ->
-            printfn "%s" (getLastDirectory x);
-            html.AppendChild(CreateElement "p" (getLastDirectory x)) |> ignore)
-    let findSub tags sub =
-        tags |> List.find (fun (x : NSoup.Nodes.Element) -> x.OwnText() = sub)
-    let rec loop head (html : NSoup.Nodes.Element) =
-        let dir = Path.Combine("input", head)
-        let sub = Directory.GetDirectories(dir) |> Seq.toList
-        addtoHtml sub html
-        //run some function here
-        match sub with
-        |[] -> ()
-        |_ -> sub |> List.iter (fun x -> 
-                printfn "next - %s" (Path.Combine(head, getLastDirectory x));
-                loop (Path.Combine(head, getLastDirectory x)) (findSub (html.Children |> Seq.toList) (getLastDirectory x)))
-    let sub = Directory.GetDirectories("input") |> Seq.toList
-    let html = CreateElement "nav" "top"
-    //addtoHtml sub html
-    loop "" html
-    printfn "%s" (html.Html())
-    0
-
 [<EntryPoint>]
 let main args =
-    //let folders = Directory.GetDirectories("input") |> Seq.toList
-    //let path = "index/fruit/index.html"
-    //let result = (Directory.GetParent(path)).FullName |> getLastDirectory
-    //printfn "%s" result
-    getNav "fucK"
-    //printfn "hello world"
-    //let t = CreateElement "li"
-    //printfn "%s" (t.ToString())
-    //let test = "input/sub1/"
-    //recurFile "input"
+    recurFile "" 
+    //File.WriteAllText("test.html", (renderTemplate head body))
     0
